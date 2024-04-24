@@ -4,6 +4,7 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from restaurant.models import Menu
+from api.serializers import MenuSerializer
 
 class MenuViewTest(TestCase):
     def setUp(self):
@@ -17,6 +18,10 @@ class MenuViewTest(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(reverse('menu_items'))
 
+        menu_items = Menu.objects.all()
+        serializer = MenuSerializer(menu_items, many=True)
+
+        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.hamburger.title)
         self.assertContains(response, self.hamburger.price)
